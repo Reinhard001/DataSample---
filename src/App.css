@@ -1,0 +1,262 @@
+/* App-specific styles */
+
+/* Smooth page transitions */
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.page-transition-exit {
+  opacity: 1;
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transition: opacity 300ms;
+}
+
+/* Custom card hover effects */
+.card-3d {
+  transform-style: preserve-3d;
+  transition: transform 0.3s ease;
+}
+
+.card-3d:hover {
+  transform: perspective(1000px) rotateX(2deg) rotateY(-2deg) translateZ(10px);
+}
+
+/* Gradient text animation */
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animated-gradient-text {
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+}
+
+/* Glass morphism enhancements */
+.glass-enhanced {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Progress bar custom styling */
+.progress-gradient {
+  background: linear-gradient(90deg, #2CA01C 0%, #00A3A3 100%);
+}
+
+/* Chart bar animations */
+.chart-bar {
+  transition: height 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Table row hover */
+.table-row-hover {
+  transition: background-color 0.2s ease;
+}
+
+.table-row-hover:hover {
+  background-color: rgba(44, 160, 28, 0.05);
+}
+
+/* Button ripple effect */
+.btn-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-ripple::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn-ripple:active::after {
+  width: 300px;
+  height: 300px;
+}
+
+/* Input focus animation */
+.input-animated {
+  position: relative;
+}
+
+.input-animated::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #2CA01C, #00A3A3);
+  transition: width 0.3s ease, left 0.3s ease;
+}
+
+.input-animated:focus-within::after {
+  width: 100%;
+  left: 0;
+}
+
+/* Badge pulse animation */
+.badge-pulse {
+  animation: badge-pulse 2s ease-in-out infinite;
+}
+
+@keyframes badge-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(44, 160, 28, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(44, 160, 28, 0);
+  }
+}
+
+/* Floating animation variations */
+.float-slow {
+  animation: float 4s ease-in-out infinite;
+}
+
+.float-fast {
+  animation: float 2s ease-in-out infinite;
+}
+
+/* Shadow transitions */
+.shadow-transition {
+  transition: box-shadow 0.3s ease;
+}
+
+.shadow-transition:hover {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Navigation link underline animation */
+.nav-link-underline {
+  position: relative;
+}
+
+.nav-link-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #2CA01C, #00A3A3);
+  transition: width 0.3s ease;
+}
+
+.nav-link-underline:hover::after {
+  width: 100%;
+}
+
+/* Card shine effect */
+.card-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-shine::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.card-shine:hover::before {
+  left: 100%;
+}
+
+/* Tab indicator animation */
+.tab-indicator {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Scroll reveal animation */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger children animation */
+.stagger-children > * {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.stagger-children.active > *:nth-child(1) { animation: stagger-in 0.5s 0.1s forwards; }
+.stagger-children.active > *:nth-child(2) { animation: stagger-in 0.5s 0.2s forwards; }
+.stagger-children.active > *:nth-child(3) { animation: stagger-in 0.5s 0.3s forwards; }
+.stagger-children.active > *:nth-child(4) { animation: stagger-in 0.5s 0.4s forwards; }
+
+@keyframes stagger-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive typography */
+@media (max-width: 640px) {
+  .heading-xl {
+    font-size: 2.5rem;
+    line-height: 1.1;
+  }
+  
+  .heading-lg {
+    font-size: 2rem;
+    line-height: 1.2;
+  }
+  
+  .heading-md {
+    font-size: 1.5rem;
+    line-height: 1.3;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
+  }
+}
