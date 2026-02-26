@@ -50,6 +50,7 @@ import SignIn from '@/pages/SignIn'
 import SignUp from '@/pages/SignUp'
 import Dashboard from '@/pages/Dashboard'
 import Analysis from '@/pages/Analysis'
+import AnalysisOutput from '@/pages/AnalysisOutput'
 import About from '@/pages/About'
 import Contact from '@/pages/Contact'
 import './App.css'
@@ -1216,6 +1217,7 @@ function AppContent() {
         {currentPage === 'home' && <HomePage setCurrentPage={handleSetCurrentPage} />}
         {currentPage === 'dashboard' && <Dashboard setCurrentPage={handleSetCurrentPage} />}
         {currentPage === 'analysis' && <Analysis setCurrentPage={handleSetCurrentPage} />}
+        {currentPage === 'analysisoutput' && <AnalysisOutput setCurrentPage={handleSetCurrentPage} />}
         {currentPage === 'about' && <About setCurrentPage={handleSetCurrentPage} />}
         {currentPage === 'contact' && <Contact setCurrentPage={handleSetCurrentPage} />}
         {currentPage === 'signin' && <SignIn setCurrentPage={handleSetCurrentPage} redirectTo={redirectTo} />}
@@ -1224,7 +1226,7 @@ function AppContent() {
 
       {/* Footer */}
       {currentPage === 'home' && <Footer setCurrentPage={handleSetCurrentPage} />}
-      {currentPage !== 'home' && currentPage !== 'signin' && currentPage !== 'signup' && (
+      {currentPage !== 'home' && currentPage !== 'signin' && currentPage !== 'signup' && currentPage !== 'analysisoutput' && (
         <footer className="bg-navy text-white py-8">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <p className="text-white/60 text-sm">

@@ -4,10 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
+import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
 import { 
   Upload, 
   FileText, 
@@ -17,7 +17,8 @@ import {
   Download,
   CheckCircle2,
   Loader2,
-  PieChart
+  PieChart,
+  Sparkles
 } from 'lucide-react'
 
 interface AnalysisProps {
@@ -32,6 +33,7 @@ export default function Analysis({ setCurrentPage }: AnalysisProps) {
   const [analyzing, setAnalyzing] = useState(false)
   const [progress, setProgress] = useState(0)
   const [results, setResults] = useState<any>(null)
+  const [showOutputDialog, setShowOutputDialog] = useState(false)
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -54,35 +56,51 @@ export default function Analysis({ setCurrentPage }: AnalysisProps) {
         if (prev >= 100) {
           clearInterval(interval)
           setAnalyzing(false)
+          // Show dialog to view output
+          setShowOutputDialog(true)
           // Generate mock results matching the dashboard preview
           setResults({
-            accuracy: 99.9,
-            efficiency: 95,
-            scalability: 98,
+            accuracy: 92.4,
+            efficiency: 88,
+            scalability: 94,
             dataPoints: 15420,
             processingTime: '2.3s',
+            methodMetrics: [
+              {
+                id: 'random',
+                name: 'Random Sampling',
+                efficiency: 84,
+                accuracy: 86,
+                scalability: 93,
+                reason: 'Fast to execute with minimal preprocessing, but accuracy dips on uneven class balance.'
+              },
+              {
+                id: 'stratified',
+                name: 'Stratified Sampling',
+                efficiency: 79,
+                accuracy: 92,
+                scalability: 88,
+                reason: 'Preserves class proportions, improving accuracy, but adds overhead during stratification.'
+              },
+              {
+                id: 'cluster',
+                name: 'Cluster Sampling',
+                efficiency: 90,
+                accuracy: 81,
+                scalability: 95,
+                reason: 'Processes clusters independently, scaling well on large data, but can miss fine-grained patterns.'
+              }
+            ],
+            best: {
+              efficiency: 'Cluster Sampling',
+              accuracy: 'Stratified Sampling',
+              scalability: 'Cluster Sampling'
+            },
             insights: [
-              'Strong positive correlation detected in Q1 data',
-              'Seasonal patterns identified with 89% confidence',
-              'Outliers detected: 3.2% of total data points',
-              'Recommended model accuracy: 99.9%',
-              'High efficiency achieved with optimized sampling'
-            ],
-            monthlyPerformance: [
-              { month: 'Jan', value: 75 },
-              { month: 'Feb', value: 82 },
-              { month: 'Mar', value: 88 },
-              { month: 'Apr', value: 85 },
-              { month: 'May', value: 92 },
-              { month: 'Jun', value: 95 },
-              { month: 'Jul', value: 98 },
-              { month: 'Aug', value: 93 }
-            ],
-            distribution: [
-              { label: 'Random Sampling', value: 30, color: '#2CA01C' },
-              { label: 'Stratified Sampling', value: 40, color: '#00A3A3' },
-              { label: 'Systematic Sampling', value: 20, color: '#1A2E35' },
-              { label: 'Cluster Sampling', value: 10, color: '#E8F5E9' }
+              'Stratified sampling achieved the highest F1 score due to balanced class coverage.',
+              'Cluster sampling scaled best on large partitions with low memory pressure.',
+              'Random sampling delivered quick turnaround but lower precision in minority classes.',
+              'Combined approach recommended for mixed workloads with tight latency constraints.'
             ]
           })
           return 100
@@ -106,15 +124,17 @@ export default function Analysis({ setCurrentPage }: AnalysisProps) {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50">
       {/* Header */}
       <div className="bg-white border-b">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Data Analysis</h1>
-              <p className="text-gray-600 mt-1">Analyze your data with advanced AI tools</p>
+        <div className="container mx-auto px-4 py-4 md:py-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 md:gap-4">
+            <div className="flex-shrink min-w-0">
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 truncate">Data Analysis</h1>
+              <p className="text-sm md:text-base text-gray-600 mt-1">Analyze your data with advanced AI tools</p>
             </div>
             <Button 
               variant="outline"
               onClick={() => setCurrentPage('dashboard')}
+              className="flex-shrink-0 self-start sm:self-auto"
+              size="sm"
             >
               Back to Dashboard
             </Button>
@@ -151,20 +171,45 @@ export default function Analysis({ setCurrentPage }: AnalysisProps) {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="type">Analysis Type</Label>
-                    <Select value={analysisType} onValueChange={setAnalysisType} disabled={analyzing}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select analysis type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="predictive">Predictive Analysis</SelectItem>
-                        <SelectItem value="descriptive">Descriptive Statistics</SelectItem>
-                        <SelectItem value="diagnostic">Diagnostic Analysis</SelectItem>
-                        <SelectItem value="prescriptive">Prescriptive Analysis</SelectItem>
-                        <SelectItem value="clustering">Clustering</SelectItem>
-                        <SelectItem value="classification">Classification</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Label htmlFor="type">Sampling Extraction Methods</Label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <Button 
+                        variant={analysisType === 'random' ? 'default' : 'outline'}
+                        onClick={() => setAnalysisType('random')}
+                        disabled={analyzing}
+                        className="h-auto py-3 flex flex-col items-center justify-center"
+                      >
+                        <span className="text-xl mb-1">1️⃣</span>
+                        <span className="text-sm">Random Sampling</span>
+                      </Button>
+                      <Button 
+                        variant={analysisType === 'stratified' ? 'default' : 'outline'}
+                        onClick={() => setAnalysisType('stratified')}
+                        disabled={analyzing}
+                        className="h-auto py-3 flex flex-col items-center justify-center"
+                      >
+                        <span className="text-xl mb-1">2️⃣</span>
+                        <span className="text-sm">Stratified Sampling</span>
+                      </Button>
+                      <Button 
+                        variant={analysisType === 'cluster' ? 'default' : 'outline'}
+                        onClick={() => setAnalysisType('cluster')}
+                        disabled={analyzing}
+                        className="h-auto py-3 flex flex-col items-center justify-center"
+                      >
+                        <span className="text-xl mb-1">3️⃣</span>
+                        <span className="text-sm">Cluster Sampling</span>
+                      </Button>
+                      <Button 
+                        variant={analysisType === 'combined' ? 'default' : 'outline'}
+                        onClick={() => setAnalysisType('combined')}
+                        disabled={analyzing}
+                        className="h-auto py-3 flex flex-col items-center justify-center"
+                      >
+                        <span className="text-xl mb-1">✨</span>
+                        <span className="text-sm">All Combined</span>
+                      </Button>
+                    </div>
                   </div>
 
                   <div className="space-y-2">
@@ -274,120 +319,135 @@ export default function Analysis({ setCurrentPage }: AnalysisProps) {
                 <TabsContent value="results" className="mt-4">
                   {results && (
                     <div className="space-y-6">
-                      <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
-                        <CheckCircle2 className="h-6 w-6 text-green-600" />
-                        <div>
-                          <h3 className="font-semibold text-green-900">Analysis Complete!</h3>
-                          <p className="text-sm text-green-700">Your data has been successfully analyzed</p>
+                      <div className="flex items-center justify-between p-4 bg-white border rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <CheckCircle2 className="h-6 w-6 text-green-600" />
+                          <div>
+                            <h3 className="font-semibold text-gray-900">Big Data Sampling Analysis</h3>
+                            <p className="text-sm text-gray-600">Results based on the uploaded dataset</p>
+                          </div>
                         </div>
+                        <Button variant="outline" onClick={handleReset}>
+                          Run New Analysis
+                        </Button>
                       </div>
 
-                      {/* Performance Metrics */}
-                      <div className="grid grid-cols-3 gap-4">
-                        <Card className="bg-white border-0 shadow-md">
-                          <CardHeader className="pb-2">
-                            <CardTitle className="text-sm text-gray-600">Accuracy</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <div className="text-3xl font-bold text-green-600">{results.accuracy}%</div>
-                            <div className="flex items-center gap-1 text-xs text-green-600 mt-1">
-                              <TrendingUp className="h-3 w-3" />
-                              <span>Excellent</span>
-                            </div>
-                          </CardContent>
-                        </Card>
-                        <Card className="bg-white border-0 shadow-md">
-                          <CardHeader className="pb-2">
+                      <div className="grid lg:grid-cols-3 gap-6">
+                        <Card className="border-0 shadow-md">
+                          <CardHeader className="pb-3">
                             <CardTitle className="text-sm text-gray-600">Efficiency</CardTitle>
+                            <CardDescription>Influence on processing time</CardDescription>
                           </CardHeader>
-                          <CardContent>
-                            <div className="text-3xl font-bold text-teal-600">{results.efficiency}%</div>
-                            <div className="flex items-center gap-1 text-xs text-teal-600 mt-1">
-                              <TrendingUp className="h-3 w-3" />
-                              <span>High</span>
-                            </div>
-                          </CardContent>
-                        </Card>
-                        <Card className="bg-white border-0 shadow-md">
-                          <CardHeader className="pb-2">
-                            <CardTitle className="text-sm text-gray-600">Scalability</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <div className="text-3xl font-bold text-blue-600">{results.scalability}%</div>
-                            <div className="flex items-center gap-1 text-xs text-blue-600 mt-1">
-                              <TrendingUp className="h-3 w-3" />
-                              <span>Optimal</span>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </div>
-
-                      {/* Charts Section */}
-                      <div className="grid lg:grid-cols-2 gap-6">
-                        {/* Monthly Performance Chart */}
-                        <Card>
-                          <CardHeader>
-                            <CardTitle className="text-lg">Monthly Performance</CardTitle>
-                            <CardDescription>Performance trend over time</CardDescription>
-                          </CardHeader>
-                          <CardContent>
-                            <div className="h-64 flex items-end justify-around gap-2">
-                              {results.monthlyPerformance.map((item: any, index: number) => (
-                                <div key={index} className="flex flex-col items-center flex-1">
-                                  <div 
-                                    className="w-full bg-gradient-to-t from-green-600 to-teal-500 rounded-t-lg transition-all duration-1000 hover:opacity-80"
-                                    style={{ height: `${item.value}%` }}
-                                    title={`${item.month}: ${item.value}%`}
-                                  />
-                                  <div className="text-xs text-gray-600 mt-2">{item.month}</div>
+                          <CardContent className="space-y-4">
+                            <div className="space-y-3">
+                              {results.methodMetrics.map((method: any) => (
+                                <div key={method.id}>
+                                  <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
+                                    <span>{method.name}</span>
+                                    <span>{method.efficiency}%</span>
+                                  </div>
+                                  <div className="h-2 rounded-full bg-gray-100">
+                                    <div
+                                      className="h-2 rounded-full bg-teal-500"
+                                      style={{ width: `${method.efficiency}%` }}
+                                    />
+                                  </div>
                                 </div>
                               ))}
                             </div>
+                            <div className="rounded-lg bg-teal-50 border border-teal-100 p-3 text-xs text-teal-900">
+                              Most efficient: <span className="font-semibold">{results.best.efficiency}</span>. Clustered batches reduce I/O overhead and allow parallel processing.
+                            </div>
                           </CardContent>
                         </Card>
 
-                        {/* Method Distribution Pie Chart */}
-                        <Card>
-                          <CardHeader>
-                            <CardTitle className="text-lg">Method Distribution</CardTitle>
-                            <CardDescription>Sampling methods breakdown</CardDescription>
+                        <Card className="border-0 shadow-md">
+                          <CardHeader className="pb-3">
+                            <CardTitle className="text-sm text-gray-600">Accuracy</CardTitle>
+                            <CardDescription>Model performance (F1 score)</CardDescription>
                           </CardHeader>
-                          <CardContent>
-                            <div className="h-64 flex items-center justify-center">
-                              <div className="relative w-48 h-48">
+                          <CardContent className="space-y-4">
+                            <div className="flex items-center justify-center">
+                              <div className="relative w-32 h-32">
                                 <svg viewBox="0 0 100 100" className="transform -rotate-90">
-                                  <circle cx="50" cy="50" r="40" fill="none" stroke="#E8F5E9" strokeWidth="20" />
-                                  <circle cx="50" cy="50" r="40" fill="none" stroke="#2CA01C" strokeWidth="20" 
-                                    strokeDasharray="75 251" strokeLinecap="round" />
-                                  <circle cx="50" cy="50" r="40" fill="none" stroke="#00A3A3" strokeWidth="20" 
-                                    strokeDasharray="100 251" strokeDashoffset="-75" strokeLinecap="round" />
-                                  <circle cx="50" cy="50" r="40" fill="none" stroke="#1A2E35" strokeWidth="20" 
-                                    strokeDasharray="50 251" strokeDashoffset="-175" strokeLinecap="round" />
+                                  <circle cx="50" cy="50" r="40" fill="none" stroke="#E5E7EB" strokeWidth="12" />
+                                  <circle
+                                    cx="50"
+                                    cy="50"
+                                    r="40"
+                                    fill="none"
+                                    stroke="#22C55E"
+                                    strokeWidth="12"
+                                    strokeDasharray={`${results.accuracy * 2.51} 251`}
+                                    strokeLinecap="round"
+                                  />
                                 </svg>
                                 <div className="absolute inset-0 flex items-center justify-center">
                                   <div className="text-center">
-                                    <div className="text-2xl font-bold text-gray-900">4</div>
-                                    <div className="text-xs text-gray-500">Methods</div>
+                                    <div className="text-2xl font-bold text-gray-900">{results.accuracy}%</div>
+                                    <div className="text-xs text-gray-500">F1 score</div>
                                   </div>
                                 </div>
                               </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-3 mt-4">
-                              {results.distribution.map((item: any, index: number) => (
-                                <div key={index} className="flex items-center gap-2">
-                                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
-                                  <div>
-                                    <div className="text-xs font-medium text-gray-700">{item.label}</div>
-                                    <div className="text-xs text-gray-500">{item.value}%</div>
+                            <div className="space-y-2">
+                              {results.methodMetrics.map((method: any) => (
+                                <div key={method.id} className="flex items-center justify-between text-xs text-gray-600">
+                                  <span>{method.name}</span>
+                                  <span>{method.accuracy}%</span>
+                                </div>
+                              ))}
+                            </div>
+                            <div className="rounded-lg bg-green-50 border border-green-100 p-3 text-xs text-green-900">
+                              Most accurate: <span className="font-semibold">{results.best.accuracy}</span>. Balanced class coverage improves recall and reduces bias.
+                            </div>
+                          </CardContent>
+                        </Card>
+
+                        <Card className="border-0 shadow-md">
+                          <CardHeader className="pb-3">
+                            <CardTitle className="text-sm text-gray-600">Scalability</CardTitle>
+                            <CardDescription>Performance with growing data</CardDescription>
+                          </CardHeader>
+                          <CardContent className="space-y-4">
+                            <div className="h-24 flex items-end justify-between gap-2">
+                              {results.methodMetrics.map((method: any) => (
+                                <div key={method.id} className="flex-1 flex flex-col items-center">
+                                  <div
+                                    className="w-full bg-blue-500/80 rounded-t-md"
+                                    style={{ height: `${method.scalability}%` }}
+                                  />
+                                  <div className="text-[10px] text-gray-600 mt-2 text-center">
+                                    {method.name.split(' ')[0]}
                                   </div>
                                 </div>
                               ))}
+                            </div>
+                            <div className="rounded-lg bg-blue-50 border border-blue-100 p-3 text-xs text-blue-900">
+                              Most scalable: <span className="font-semibold">{results.best.scalability}</span>. Clustered partitions distribute load and minimize cross-node traffic.
                             </div>
                           </CardContent>
                         </Card>
                       </div>
 
-                      {/* Additional Metrics */}
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>Method Comparison</CardTitle>
+                          <CardDescription>Efficiency, accuracy, scalability, and reasoning</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          {results.methodMetrics.map((method: any) => (
+                            <div key={method.id} className="border rounded-lg p-4">
+                              <div className="flex items-center justify-between">
+                                <div className="font-semibold text-gray-900">{method.name}</div>
+                                <div className="text-xs text-gray-500">Eff {method.efficiency}% • Acc {method.accuracy}% • Scal {method.scalability}%</div>
+                              </div>
+                              <p className="text-sm text-gray-600 mt-2">{method.reason}</p>
+                            </div>
+                          ))}
+                        </CardContent>
+                      </Card>
+
                       <div className="grid grid-cols-2 gap-4">
                         <Card>
                           <CardHeader className="pb-3">
@@ -404,7 +464,7 @@ export default function Analysis({ setCurrentPage }: AnalysisProps) {
                           </CardHeader>
                           <CardContent>
                             <div className="text-2xl font-bold">{results.processingTime}</div>
-                            <p className="text-xs text-gray-500 mt-1">Lightning fast</p>
+                            <p className="text-xs text-gray-500 mt-1">Optimized sampling runtime</p>
                           </CardContent>
                         </Card>
                       </div>
@@ -429,9 +489,6 @@ export default function Analysis({ setCurrentPage }: AnalysisProps) {
                         <Button className="flex-1">
                           <Download className="mr-2 h-4 w-4" />
                           Download Report
-                        </Button>
-                        <Button variant="outline" onClick={handleReset}>
-                          New Analysis
                         </Button>
                       </div>
                     </div>
@@ -515,6 +572,56 @@ export default function Analysis({ setCurrentPage }: AnalysisProps) {
           </div>
         </div>
       </div>
+
+      {/* Analysis Complete Dialog */}
+      <AlertDialog open={showOutputDialog} onOpenChange={setShowOutputDialog}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <div className="flex items-center justify-center mb-4">
+              <div className="p-3 bg-green-100 rounded-full">
+                <CheckCircle2 className="h-8 w-8 text-green-600" />
+              </div>
+            </div>
+            <AlertDialogTitle className="text-center text-xl">
+              Analysis Complete!
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center space-y-3">
+              <p>
+                Your Big Data Sampling Analysis has been successfully completed.
+              </p>
+              <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="flex items-center justify-center gap-2 text-blue-900">
+                  <Sparkles className="h-4 w-4" />
+                  <span className="text-sm font-medium">
+                    Comprehensive results are ready to view
+                  </span>
+                </div>
+              </div>
+              <p className="text-sm">
+                View detailed metrics, comparisons, and recommendations for all sampling methods.
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowOutputDialog(false)}
+              className="w-full sm:w-auto"
+            >
+              Stay Here
+            </Button>
+            <AlertDialogAction
+              onClick={() => {
+                setShowOutputDialog(false)
+                setCurrentPage('analysisoutput')
+              }}
+              className="w-full sm:w-auto bg-green-600 hover:bg-green-700"
+            >
+              View Output Report
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

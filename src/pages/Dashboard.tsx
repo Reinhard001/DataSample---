@@ -42,34 +42,37 @@ export default function Dashboard({ setCurrentPage }: DashboardProps) {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Header */}
       <div className="bg-white border-b">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-              <p className="text-gray-600 mt-1">Welcome back, {user?.name}!</p>
+        <div className="container mx-auto px-4 py-4 md:py-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex-shrink-0">
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Dashboard</h1>
+              <p className="text-sm md:text-base text-gray-600 mt-1">Welcome back, {user?.name}!</p>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-2 md:gap-3">
               <Button 
                 onClick={() => setCurrentPage('analysis')}
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-blue-600 hover:bg-blue-700 text-sm md:text-base"
+                size="sm"
               >
-                <BarChart3 className="mr-2 h-4 w-4" />
-                Start New Analysis
+                <BarChart3 className="mr-1 md:mr-2 h-4 w-4" />
+                <span className="hidden sm:inline">Start New </span>Analysis
               </Button>
               <Button 
                 variant="outline"
-                className="text-black border-gray-300 hover:bg-gray-50"
+                className="text-black border-gray-300 hover:bg-gray-50 text-sm md:text-base hidden lg:inline-flex"
+                size="sm"
               >
                 Learn More
               </Button>
               <Button 
                 variant="outline"
-                className="text-black border-gray-300 hover:bg-gray-50"
+                className="text-black border-gray-300 hover:bg-gray-50 text-sm md:text-base hidden lg:inline-flex"
+                size="sm"
               >
                 View Documents
               </Button>
-              <Avatar>
-                <AvatarFallback className="bg-blue-600 text-white">
+              <Avatar className="h-8 w-8 md:h-10 md:w-10">
+                <AvatarFallback className="bg-blue-600 text-white text-xs md:text-sm">
                   {user?.name?.split(' ').map(n => n[0]).join('').toUpperCase()}
                 </AvatarFallback>
               </Avatar>
