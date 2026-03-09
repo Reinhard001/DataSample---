@@ -20,6 +20,7 @@ import {
   PieChart,
   Sparkles
 } from 'lucide-react'
+import { uploadDataset, analyzeDataset } from '@/lib/api'
 
 interface AnalysisProps {
   setCurrentPage: (page: string) => void
@@ -41,7 +42,7 @@ export default function Analysis({ setCurrentPage }: AnalysisProps) {
     }
   }
 
-  const handleStartAnalysis = () => {
+  const handleStartAnalysis = async () => {
     if (!analysisName || !analysisType || !file) {
       alert('Please fill in all fields and upload a file')
       return
@@ -50,64 +51,29 @@ export default function Analysis({ setCurrentPage }: AnalysisProps) {
     setAnalyzing(true)
     setProgress(0)
 
-    // Simulate analysis progress
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval)
-          setAnalyzing(false)
-          // Show dialog to view output
-          setShowOutputDialog(true)
-          // Generate mock results matching the dashboard preview
-          setResults({
-            accuracy: 92.4,
-            efficiency: 88,
-            scalability: 94,
-            dataPoints: 15420,
-            processingTime: '2.3s',
-            methodMetrics: [
-              {
-                id: 'random',
-                name: 'Random Sampling',
-                efficiency: 84,
-                accuracy: 86,
-                scalability: 93,
-                reason: 'Fast to execute with minimal preprocessing, but accuracy dips on uneven class balance.'
-              },
-              {
-                id: 'stratified',
-                name: 'Stratified Sampling',
-                efficiency: 79,
-                accuracy: 92,
-                scalability: 88,
-                reason: 'Preserves class proportions, improving accuracy, but adds overhead during stratification.'
-              },
-              {
-                id: 'cluster',
-                name: 'Cluster Sampling',
-                efficiency: 90,
-                accuracy: 81,
-                scalability: 95,
-                reason: 'Processes clusters independently, scaling well on large data, but can miss fine-grained patterns.'
-              }
-            ],
-            best: {
-              efficiency: 'Cluster Sampling',
-              accuracy: 'Stratified Sampling',
-              scalability: 'Cluster Sampling'
-            },
-            insights: [
-              'Stratified sampling achieved the highest F1 score due to balanced class coverage.',
-              'Cluster sampling scaled best on large partitions with low memory pressure.',
-              'Random sampling delivered quick turnaround but lower precision in minority classes.',
-              'Combined approach recommended for mixed workloads with tight latency constraints.'
-            ]
-          })
-          return 100
-        }
-        return prev + 2
+    try {
+      // Step 1: Upload dataset
+      setProgress(20)
+      const datasetId = await uploadDataset(file, {
+        analysis_name: analysisName,
+        analysis_type: analysisType as 'Random' | 'Stratified' | 'Cluster',
+        description,
       })
-    }, 100)
+
+      setProgress(50)
+
+      // Step 2: Analyze dataset with 0.8 sample fraction (80% of data)
+      const results = await analyzeDataset(datasetId, 0.8, analysisType)
+      
+      setProgress(100)
+      setAnalyzing(false)
+      setShowOutputDialog(true)
+      setResults(results)
+    } catch (error) {
+      setAnalyzing(false)
+      alert(`Error: ${error instanceof Error ? error.message : 'Analysis failed'}`)
+      console.error(error)
+    }
   }
 
   const handleReset = () => {
