@@ -71,3 +71,36 @@ export default defineConfig([
   },
 ])
 ```
+
+## Deployment
+
+### Frontend on Vercel
+
+- Config file: `vercel.json`
+- Ignore file for compact upload: `.vercelignore`
+- Build command: `npm run build`
+- Output directory: `dist`
+
+Deploy steps:
+
+1. Import this repo into Vercel.
+2. Framework preset: Vite.
+3. Root directory: project root.
+4. Deploy.
+
+### Backend on Render (Python)
+
+- Config file: `render.yaml`
+- Service root: `backend`
+- Start command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+
+Set these environment variables in Render:
+
+- `DATABASE_URL` (recommended), or `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`, `DB_NAME`
+- `CORS_ORIGINS` (comma-separated), include your Vercel frontend URL
+
+Example:
+
+`CORS_ORIGINS=https://your-frontend.vercel.app,http://localhost:5173`
+
+Note: the backend in this repo is FastAPI (not Flask), and Render is configured for FastAPI.

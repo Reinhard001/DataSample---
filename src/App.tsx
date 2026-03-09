@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react'
 import { 
   BarChart3, 
-  PieChart, 
   Activity, 
   Zap, 
   Target, 
-  TrendingUp, 
   Database,
   Menu,
   X,
@@ -21,29 +19,19 @@ import {
   Play,
   Shield,
   Cpu,
-  BarChart,
-  Timer,
   FileText,
-  Settings,
-  Download,
-  RefreshCw,
   Sparkles,
   Layers,
-  Award,
   LogOut,
-  User
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { AuthProvider, useAuth } from '@/contexts/AuthContext'
 import SignIn from '@/pages/SignIn'
@@ -980,197 +968,6 @@ function Footer({ setCurrentPage }: { setCurrentPage: (page: string) => void }) 
         </div>
       </div>
     </footer>
-  )
-}
-
-// Crosshair icon component
-function Crosshair({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <circle cx="12" cy="12" r="10" />
-      <line x1="12" y1="2" x2="12" y2="6" />
-      <line x1="12" y1="18" x2="12" y2="22" />
-      <line x1="2" y1="12" x2="6" y2="12" />
-      <line x1="18" y1="12" x2="22" y2="12" />
-    </svg>
-  )
-}
-
-// Analysis Page
-function AnalysisPage() {
-  const [activeTab, setActiveTab] = useState('accuracy')
-
-  const comparisonData = [
-    { method: 'Random Sampling', accuracy: 87, efficiency: 92, scalability: 85, time: '1.2s' },
-    { method: 'Stratified Sampling', accuracy: 95, efficiency: 88, scalability: 78, time: '2.1s' },
-    { method: 'Systematic Sampling', accuracy: 89, efficiency: 94, scalability: 90, time: '0.9s' },
-    { method: 'Cluster Sampling', accuracy: 82, efficiency: 96, scalability: 95, time: '0.7s' }
-  ]
-
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-primary-light/30 to-white pt-24 pb-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="heading-lg text-navy mb-2">In-depth Analysis</h1>
-          <p className="text-muted-foreground">Compare accuracy, efficiency, and scalability across sampling methods.</p>
-        </div>
-
-        {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-          <TabsList className="grid w-full grid-cols-3 lg:w-auto lg:inline-flex">
-            <TabsTrigger value="accuracy" className="flex items-center gap-2">
-              <Target className="w-4 h-4" />
-              Accuracy
-            </TabsTrigger>
-            <TabsTrigger value="efficiency" className="flex items-center gap-2">
-              <Zap className="w-4 h-4" />
-              Efficiency
-            </TabsTrigger>
-            <TabsTrigger value="scalability" className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4" />
-              Scalability
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="accuracy" className="space-y-8">
-            <Card className="border-0 shadow-card">
-              <CardHeader>
-                <CardTitle>Accuracy Comparison</CardTitle>
-                <CardDescription>Statistical accuracy across different sampling methods</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {comparisonData.map((item, index) => (
-                    <div key={index} className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="font-medium text-navy">{item.method}</span>
-                        <span className="text-primary font-semibold">{item.accuracy}%</span>
-                      </div>
-                      <div className="h-3 bg-primary/10 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-gradient-to-r from-primary to-teal rounded-full transition-all duration-1000"
-                          style={{ width: `${item.accuracy}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <div className="grid md:grid-cols-3 gap-6">
-              {[
-                { title: 'Best Accuracy', method: 'Stratified Sampling', value: '95%', icon: Award },
-                { title: 'Most Consistent', method: 'Systematic Sampling', value: '±2%', icon: CheckCircle2 },
-                { title: 'Recommended', method: 'Stratified', value: 'For precision', icon: Sparkles }
-              ].map((stat, index) => (
-                <Card key={index} className="border-0 shadow-card">
-                  <CardContent className="p-6 text-center">
-                    <stat.icon className="w-8 h-8 text-primary mx-auto mb-3" />
-                    <div className="text-sm text-muted-foreground">{stat.title}</div>
-                    <div className="text-lg font-bold text-navy">{stat.method}</div>
-                    <div className="text-primary font-semibold">{stat.value}</div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="efficiency" className="space-y-8">
-            <Card className="border-0 shadow-card">
-              <CardHeader>
-                <CardTitle>Efficiency Metrics</CardTitle>
-                <CardDescription>Processing time and resource utilization</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Method</TableHead>
-                      <TableHead>Processing Time</TableHead>
-                      <TableHead>Memory Usage</TableHead>
-                      <TableHead>CPU Utilization</TableHead>
-                      <TableHead>Score</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {comparisonData.map((item, index) => (
-                      <TableRow key={index}>
-                        <TableCell className="font-medium">{item.method}</TableCell>
-                        <TableCell>{item.time}</TableCell>
-                        <TableCell>{(item.efficiency * 0.8).toFixed(0)} MB</TableCell>
-                        <TableCell>{(item.efficiency * 0.6).toFixed(0)}%</TableCell>
-                        <TableCell>
-                          <Badge className={item.efficiency >= 90 ? 'bg-primary' : 'bg-teal'}>
-                            {item.efficiency}%
-                          </Badge>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="scalability" className="space-y-8">
-            <Card className="border-0 shadow-card">
-              <CardHeader>
-                <CardTitle>Scalability Analysis</CardTitle>
-                <CardDescription>Performance at different data volumes</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  {[
-                    { size: '100K records', random: 95, stratified: 90, systematic: 93, cluster: 97 },
-                    { size: '1M records', random: 90, stratified: 85, systematic: 91, cluster: 95 },
-                    { size: '10M records', random: 85, stratified: 78, systematic: 88, cluster: 94 },
-                    { size: '100M records', random: 78, stratified: 68, systematic: 82, cluster: 92 }
-                  ].map((row, index) => (
-                    <div key={index} className="space-y-2">
-                      <div className="font-medium text-navy text-sm">{row.size}</div>
-                      <div className="grid grid-cols-4 gap-2">
-                        {[
-                          { name: 'Random', value: row.random },
-                          { name: 'Stratified', value: row.stratified },
-                          { name: 'Systematic', value: row.systematic },
-                          { name: 'Cluster', value: row.cluster }
-                        ].map((method, i) => (
-                          <div key={i} className="text-center">
-                            <div className="h-20 bg-primary/10 rounded-lg relative overflow-hidden">
-                              <div 
-                                className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-primary to-teal transition-all duration-500"
-                                style={{ height: `${method.value}%` }}
-                              />
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <span className="text-xs font-bold text-navy">{method.value}%</span>
-                              </div>
-                            </div>
-                            <div className="text-xs text-muted-foreground mt-1">{method.name}</div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-
-        {/* Analysis Image */}
-        <Card className="mt-8 border-0 shadow-card overflow-hidden">
-          <CardContent className="p-0">
-            <img 
-              src="/analysis-charts.jpg" 
-              alt="Analysis Charts"
-              className="w-full"
-            />
-          </CardContent>
-        </Card>
-      </div>
-    </div>
   )
 }
 

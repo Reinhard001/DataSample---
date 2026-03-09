@@ -105,6 +105,9 @@ async def analyze_dataset(
     - cluster_column: Column for cluster sampling
     """
     try:
+        if not 0 < sample_fraction <= 1:
+            raise HTTPException(status_code=400, detail="sample_fraction must be between 0 and 1")
+
         # Get dataset from database
         dataset = db.query(Dataset).filter(Dataset.id == dataset_id).first()
         if not dataset:
@@ -118,11 +121,11 @@ async def analyze_dataset(
         
         # Perform analysis based on type
         if analysis_type == 'random':
-            return await _random_analysis(df, dataset, db)
+            return await _random_analysis(df, dataset, sample_fraction, db)
         elif analysis_type == 'stratified':
             if not target_column:
                 raise HTTPException(status_code=400, detail="target_column required for stratified sampling")
-            return await _stratified_analysis(df, dataset, target_column, db)
+            return await _stratified_analysis(df, dataset, target_column, sample_fraction, db)
         elif analysis_type == 'cluster':
             if not cluster_column:
                 raise HTTPException(status_code=400, detail="cluster_column required for cluster sampling")
@@ -138,16 +141,16 @@ async def analyze_dataset(
         raise HTTPException(status_code=500, detail=f"Error analyzing dataset: {str(e)}")
 
 
-async def _random_analysis(df: pd.DataFrame, dataset: Dataset, db: Session):
+async def _random_analysis(df: pd.DataFrame, dataset: Dataset, sample_fraction: float, db: Session):
     """Random sampling analysis"""
-    sampled_df, metrics = SamplingMethods.random_sampling(df, 0.2)
+    sampled_df, metrics = SamplingMethods.random_sampling(df, sample_fraction)
     
     accuracy_metrics = PerformanceMetrics.calculate_accuracy_metrics(df, sampled_df)
     scalability_score = PerformanceMetrics.calculate_scalability_score(
         metrics['execution_time'],
         metrics['memory_usage'],
         metrics['cpu_usage'],
-        0.2
+        sample_fraction
     )
     
     # Store in database
@@ -163,7 +166,7 @@ async def _random_analysis(df: pd.DataFrame, dataset: Dataset, db: Session):
     experiment = Experiment(
         dataset_id=dataset.id,
         method_id=method.id,
-        sample_fraction=0.2,
+        sample_fraction=sample_fraction,
         execution_time=metrics['execution_time'],
         memory_usage=metrics['memory_usage'],
         cpu_usage=metrics['cpu_usage'],
@@ -202,16 +205,16 @@ async def _random_analysis(df: pd.DataFrame, dataset: Dataset, db: Session):
     }
 
 
-async def _stratified_analysis(df: pd.DataFrame, dataset: Dataset, target_column: str, db: Session):
+async def _stratified_analysis(df: pd.DataFrame, dataset: Dataset, target_column: str, sample_fraction: float, db: Session):
     """Stratified sampling analysis"""
-    sampled_df, metrics = SamplingMethods.stratified_sampling(df, target_column, 0.2)
+    sampled_df, metrics = SamplingMethods.stratified_sampling(df, target_column, sample_fraction)
     
     accuracy_metrics = PerformanceMetrics.calculate_accuracy_metrics(df, sampled_df)
     scalability_score = PerformanceMetrics.calculate_scalability_score(
         metrics['execution_time'],
         metrics['memory_usage'],
         metrics['cpu_usage'],
-        0.2
+        sample_fraction
     )
     
     # Store in database
@@ -227,7 +230,7 @@ async def _stratified_analysis(df: pd.DataFrame, dataset: Dataset, target_column
     experiment = Experiment(
         dataset_id=dataset.id,
         method_id=method.id,
-        sample_fraction=0.2,
+        sample_fraction=sample_fraction,
         execution_time=metrics['execution_time'],
         memory_usage=metrics['memory_usage'],
         cpu_usage=metrics['cpu_usage'],

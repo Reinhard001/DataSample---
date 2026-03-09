@@ -117,6 +117,28 @@ Server will run at: `http://127.0.0.1:8000`
 
 API Documentation: `http://127.0.0.1:8000/docs`
 
+## Deploy to Render
+
+This repository includes `render.yaml` at project root with backend service settings.
+
+### Render settings (already defined)
+
+- Runtime: Python
+- Root directory: `backend`
+- Build command: `pip install -r requirements.txt`
+- Start command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+- Health check path: `/health`
+
+### Required environment variables
+
+- `DATABASE_URL` (preferred on Render PostgreSQL)
+- or `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`, `DB_NAME`
+- `CORS_ORIGINS` as comma-separated URLs (include Vercel URL)
+
+Example:
+
+`CORS_ORIGINS=https://your-frontend.vercel.app,http://localhost:5173`
+
 ## API Endpoints
 
 ### Analysis

@@ -27,11 +27,35 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null)
 
+  const parseUsers = (): Array<{ id: string; name: string; email: string; password: string }> => {
+    const rawUsers = localStorage.getItem('users')
+    if (!rawUsers) {
+      return []
+    }
+
+    try {
+      const parsedUsers = JSON.parse(rawUsers)
+      return Array.isArray(parsedUsers) ? parsedUsers : []
+    } catch {
+      localStorage.removeItem('users')
+      return []
+    }
+  }
+
   // Load user from localStorage on mount
   useEffect(() => {
     const storedUser = localStorage.getItem('user')
     if (storedUser) {
-      setUser(JSON.parse(storedUser))
+      try {
+        const parsedUser = JSON.parse(storedUser)
+        if (parsedUser && typeof parsedUser === 'object') {
+          setUser(parsedUser)
+        } else {
+          localStorage.removeItem('user')
+        }
+      } catch {
+        localStorage.removeItem('user')
+      }
     }
   }, [])
 
@@ -40,7 +64,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await new Promise(resolve => setTimeout(resolve, 500))
     
     // Check if user exists in localStorage
-    const users = JSON.parse(localStorage.getItem('users') || '[]')
+    const users = parseUsers()
     const foundUser = users.find((u: any) => u.email === email && u.password === password)
     
     if (foundUser) {
@@ -57,7 +81,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await new Promise(resolve => setTimeout(resolve, 500))
     
     // Check if user already exists
-    const users = JSON.parse(localStorage.getItem('users') || '[]')
+    const users = parseUsers()
     if (users.find((u: any) => u.email === email)) {
       return false // User already exists
     }
